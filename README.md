@@ -212,25 +212,28 @@ O CRM registra automaticamente informações como:
 
 ## Fluxo no n8n
 
-> *(Adicionar print do workflow)*
+<img width="1871" height="430" alt="image" src="https://github.com/user-attachments/assets/69b1179c-9ba9-47e1-9f22-93b042250e6f" />
+
 
 ---
 
 ## CRM
 
-> *(Adicionar print da planilha)*
+>Testado com Dados reais*
 
 ---
 
 ## E-mail de confirmação
 
-> *(Adicionar print do e-mail)*
+<img width="572" height="541" alt="image" src="https://github.com/user-attachments/assets/9358abf1-cef3-476c-bb6f-bef7d573033e" />
+
 
 ---
 
 ## E-mail de duplicidade
 
-> *(Adicionar print do e-mail)*
+<img width="578" height="477" alt="image" src="https://github.com/user-attachments/assets/d6b6b618-263c-460e-a67f-dbeef44c63c3" />
+
 
 ---
 
