@@ -1,0 +1,870 @@
+{
+  "name": "Estudo #4.1 Automação + Extração de dados + CRM",
+  "nodes": [
+    {
+      "parameters": {
+        "text": "={{ $json.text }}",
+        "schemaType": "fromJson",
+        "jsonSchemaExample": "{\n  \"nome\": \"\",\n  \"email\": \"\",\n  \"telefone\": \"\",\n  \"cidade\": \"\",\n  \"linkedin\": \"\",\n  \"cargo_desejado\": \"\",\n  \"area_principal\": \"\",\n  \"senioridade\": \"Júnior\",\n  \"resumo_ia\": \"\",\n  \"habilidades_tecnicas\": \"\",\n  \"habilidades_comportamentais\": \"\",\n  \"formacao\": \"\",\n  \"experiencia_anos\": \"Sem experiência\",\n  \"status_funil\": \"Analisado pela IA\",\n  \"observacoes\": \"\"\n}",
+        "options": {
+          "systemPromptTemplate": "Você é um assistente especializado em análise de currículos para um CRM de candidatos.\n\nExtraia as informações do currículo de forma objetiva, organizada e fiel ao texto recebido.\n\nUse apenas informações presentes no currículo para:\nnome, email, telefone, cidade, linkedin, cargo_desejado, formação e habilidades.\n\nPara area_principal, classifique a principal área de atuação do candidato com base no currículo.\n\nPara senioridade, classifique como:\nAssistente, Júnior, Pleno ou Sênior.\n\nPara experiencia_anos, calcule o tempo total aproximado de experiência profissional com base nas experiências listadas no currículo.\n\nRetorne apenas um texto curto no campo experiencia_anos, como:\n\"Sem experiência\"\n\"1 ano\"\n\"2 anos e 6 meses\"\n\"5 anos\"\n\nNão liste datas.\nNão liste cargos.\nNão liste períodos separados.\n\nSe o currículo informar que o candidato não possui experiência profissional, retorne:\n\"Sem experiência\"\n\nPara status_funil, retorne sempre exatamente:\n\"Analisado pela IA\"\n\nQuando alguma informação não estiver disponível no currículo, deixe o campo vazio, exceto status_funil, que deve sempre retornar \"Analisado pela IA\".\n\nNão invente dados.\nNão crie LinkedIn se não estiver no currículo.\nNão crie cidade se não estiver clara no currículo."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.informationExtractor",
+      "typeVersion": 1.2,
+      "position": [
+        368,
+        -704
+      ],
+      "id": "2d6e15ef-649f-42b2-be4c-83bfc511ed1d",
+      "name": "Information Extractor",
+      "notes": "Extraia as informações do currículo para preencher um CRM de candidatos.\n\nUse apenas informações presentes no currículo para nome, email, telefone, cidade, linkedin, cargo_desejado, formação e habilidades.\n\nPara o campo experiencia_anos, calcule o tempo total aproximado de experiência profissional com base nas datas das experiências listadas no currículo.\n\nRetorne apenas um texto curto, como:\n\"5 anos\"\n\"3 anos\"\n\"2 anos e 6 meses\"\n\nNão liste datas.\nNão liste cargos.\nNão liste períodos separados.\nNão retorne várias experiências.\n\nPara o campo status_funil, retorne sempre exatamente:\n\"Analisado pela IA\"\n\nQuando alguma informação não estiver disponível no currículo, deixe o campo vazio, exceto status_funil, que deve sempre retornar \"Analisado pela IA\"."
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-5.5",
+          "mode": "list",
+          "cachedResultName": "gpt-5.5"
+        },
+        "responsesApiEnabled": false,
+        "options": {
+          "frequencyPenalty": 0,
+          "presencePenalty": 0,
+          "temperature": 1,
+          "reasoningEffort": "medium",
+          "maxRetries": 2
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        368,
+        -576
+      ],
+      "id": "79b9c427-02c2-4738-a0e4-2ebab2a18331",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": null,
+          "name": "",
+          "__aiGatewayManaged": true
+        }
+      },
+      "notes": "Extraia as informações do currículo para preencher um CRM de candidatos.\n\nUse apenas informações presentes no currículo para nome, email, telefone, cidade, linkedin, cargo_desejado, formação e habilidades.\n\nPara area_principal, classifique a principal área de atuação do candidato com base no currículo.\n\nPara senioridade, classifique como:\nAssistente, Júnior, Pleno ou Sênior.\n\nPara experiencia_anos, calcule o tempo total aproximado de experiência profissional com base nas experiências listadas no currículo.\n\nRetorne apenas um texto curto, como:\n\"Sem experiência\"\n\"1 ano\"\n\"2 anos e 6 meses\"\n\"5 anos\"\n\nNão liste datas.\nNão liste cargos.\nNão liste períodos separados.\n\nPara status_funil, retorne sempre exatamente:\n\"Analisado pela IA\"\n\nQuando alguma informação não estiver disponível no currículo, deixe o campo vazio, exceto status_funil, que deve sempre retornar \"Analisado pela IA\"."
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "3de9bbca-da84-4be2-92be-caac3ecd39f9",
+              "leftValue": "={{ String($json.email || '').trim() !== '' }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        1472,
+        -1040
+      ],
+      "id": "805c2608-f06e-45d0-81f6-ba7f70a07dd7",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1qIWS2yQ9JStiSlPBmtprN07pJMEpJRuIBQ0EkU0ldm0",
+          "mode": "list",
+          "cachedResultName": "CVFlow - CRM Curriculo",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1qIWS2yQ9JStiSlPBmtprN07pJMEpJRuIBQ0EkU0ldm0/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 2003250265,
+          "mode": "list",
+          "cachedResultName": "Candidatos",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1qIWS2yQ9JStiSlPBmtprN07pJMEpJRuIBQ0EkU0ldm0/edit#gid=2003250265"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "nome": "={{ $json.cand_nome }}",
+            "email": "={{ $json.cand_email }}",
+            "telefone": "={{ $json.cand_telefone }}",
+            "cidade": "={{ $json.cand_cidade }}",
+            "linkedin": "={{ $json.cand_linkedin }}",
+            "cargo_desejado": "={{ $json.cand_cargo_desejado }}",
+            "area_principal": "={{ $json.cand_area_principal }}",
+            "senioridade": "={{ $json.cand_senioridade }}",
+            "resumo_ia": "={{ $json.cand_resumo_ia }}",
+            "habilidades_tecnicas": "={{ $json.cand_habilidades_tecnicas }}",
+            "habilidades_comportamentais": "={{ $json.cand_habilidades_comportamentais }}",
+            "formacao": "={{ $json.cand_formacao }}",
+            "experiencia_anos": "={{ $json.cand_experiencia_anos }}",
+            "status_funil": "=Analisado pela IA",
+            "observacoes": "={{ $json.cand_observacoes }}",
+            "data_cadastro": "={{ $now.setZone('America/Recife').toFormat('dd/MM/yyyy') }}",
+            "link_curriculo": "={{ $json.link_curriculo }}",
+            "id_arquivo_drive": "={{ $json.drive_file_id }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "id_candidato",
+              "displayName": "id_candidato",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "data_cadastro",
+              "displayName": "data_cadastro",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "nome",
+              "displayName": "nome",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "email",
+              "displayName": "email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "telefone",
+              "displayName": "telefone",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "cidade",
+              "displayName": "cidade",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "linkedin",
+              "displayName": "linkedin",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "cargo_desejado",
+              "displayName": "cargo_desejado",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "area_principal",
+              "displayName": "area_principal",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "senioridade",
+              "displayName": "senioridade",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "resumo_ia",
+              "displayName": "resumo_ia",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "habilidades_tecnicas",
+              "displayName": "habilidades_tecnicas",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "habilidades_comportamentais",
+              "displayName": "habilidades_comportamentais",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "formacao",
+              "displayName": "formacao",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "experiencia_anos",
+              "displayName": "experiencia_anos",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "status_funil",
+              "displayName": "status_funil",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "link_curriculo",
+              "displayName": "link_curriculo",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "observacoes",
+              "displayName": "observacoes",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "id_arquivo_drive",
+              "displayName": "id_arquivo_drive",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        2048,
+        -928
+      ],
+      "id": "776dc795-6a86-4b23-a5f8-636327993943",
+      "name": "Alimentação em CRM",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "SOnlTUthERIsn1fa",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "messageId": "={{ $json.email_id }}",
+        "simple": false,
+        "options": {
+          "dataPropertyAttachmentsPrefixName": "attachment_",
+          "downloadAttachments": true
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        -192,
+        -960
+      ],
+      "id": "a0091b26-7e41-41d7-a533-706d7964e9ae",
+      "name": "Recolhe email com PDF",
+      "webhookId": "aa6e11d1-5b21-4b5a-b0ad-92a7d26157d5",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "xnkyXrokUbWcNpLM",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes",
+              "minutesInterval": 1
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        -736,
+        -960
+      ],
+      "id": "81a6c15f-db7c-4188-91f9-bf3349427c85",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "limit": 10,
+        "filters": {
+          "q": "in:inbox is:unread has:attachment filename:pdf subject:CVFlow"
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        -576,
+        -960
+      ],
+      "id": "1205a2eb-5c61-42e5-a363-9fdecbd488ce",
+      "name": "Get many messages",
+      "webhookId": "a41b1af5-f9a5-49e2-99f4-bc2b533f4a0c",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "xnkyXrokUbWcNpLM",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all();\n\nif (items.length === 0) {\n  return [];\n}\n\nfunction getTime(item) {\n  const json = item.json || {};\n\n  if (json.internalDate) {\n    return Number(json.internalDate);\n  }\n\n  if (json.date) {\n    return new Date(json.date).getTime();\n  }\n\n  if (json.Date) {\n    return new Date(json.Date).getTime();\n  }\n\n  return 0;\n}\n\n// Ordena do mais antigo para o mais recente\nitems.sort((a, b) => getTime(a) - getTime(b));\n\n// Seleciona apenas o primeiro da fila\nconst selected = items[0];\n\nreturn [\n  {\n    json: {\n      ...selected.json,\n      email_id: selected.json.id,\n      selecionado_para_processamento: true\n    }\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -384,
+        -960
+      ],
+      "id": "799203fd-74df-4c2a-8879-df4679ac87c7",
+      "name": "Selecionar 1 e-mail"
+    },
+    {
+      "parameters": {
+        "operation": "pdf",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1.1,
+      "position": [
+        176,
+        -960
+      ],
+      "id": "ccaaf638-87bc-4002-bc6b-a007b4024471",
+      "name": "Extraindo informações"
+    },
+    {
+      "parameters": {
+        "name": "={{ $json.arquivo_nome || 'curriculo_' + $now.setZone('America/Recife').toFormat('yyyyMMdd_HHmmss') + '.pdf' }}",
+        "driveId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "My Drive"
+        },
+        "folderId": {
+          "__rl": true,
+          "value": "1uIM7Ajic9rMImT3K1zbuxSDvIT49ikXb",
+          "mode": "list",
+          "cachedResultName": "Curriculos_processados",
+          "cachedResultUrl": "https://drive.google.com/drive/folders/1uIM7Ajic9rMImT3K1zbuxSDvIT49ikXb"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        1712,
+        -928
+      ],
+      "id": "0854a038-d195-4c29-ae26-48407a896ed5",
+      "name": "Upload file",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "uI0aVJmRYapE73wc",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const output = $json.output || {};\n\n// Dados do e-mail/PDF vindos do node Filtrar 1 PDF\nlet dadosEmail = {};\nlet dadosBinary = {};\n\ntry {\n  const pdfNode = $('Filtrar 1 PDF').first();\n  dadosEmail = pdfNode.json || {};\n  dadosBinary = pdfNode.binary || {};\n} catch (error) {\n  dadosEmail = {};\n  dadosBinary = {};\n}\n\nreturn {\n  json: {\n    // Dados do candidato extraídos pela IA\n    cand_nome: output.nome || '',\n    cand_email: String(output.email || '').toLowerCase().trim(),\n    cand_telefone: output.telefone || '',\n    cand_cidade: output.cidade || '',\n    cand_linkedin: output.linkedin || '',\n    cand_cargo_desejado: output.cargo_desejado || '',\n    cand_area_principal: output.area_principal || '',\n    cand_senioridade: output.senioridade || '',\n    cand_resumo_ia: output.resumo_ia || '',\n    cand_habilidades_tecnicas: output.habilidades_tecnicas || '',\n    cand_habilidades_comportamentais: output.habilidades_comportamentais || '',\n    cand_formacao: output.formacao || '',\n    cand_experiencia_anos: output.experiencia_anos || '',\n    cand_status_funil: output.status_funil || 'Analisado pela IA',\n    cand_observacoes: output.observacoes || '',\n\n    // Dados do e-mail original\n    email_id: dadosEmail.email_id || '',\n    thread_id: dadosEmail.thread_id || '',\n    assunto_email: dadosEmail.assunto || '',\n    remetente: dadosEmail.remetente || '',\n    remetente_email: dadosEmail.remetente_email || '',\n    arquivo_nome: dadosEmail.arquivo_nome || ''\n  },\n  binary: dadosBinary\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        672,
+        -704
+      ],
+      "id": "75b7b2cf-06f3-4473-b03b-c3f0581a0724",
+      "name": "Preparar dados do candidato"
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all();\n\nif (items.length === 0) {\n  return [];\n}\n\nconst item = items[0];\nconst binaries = item.binary || {};\n\n// Pega dados do e-mail selecionado no node anterior\nconst emailSelecionado = $('Selecionar 1 e-mail').first().json;\n\n// Assunto\nconst assunto =\n  emailSelecionado.subject ||\n  emailSelecionado.Subject ||\n  item.json.subject ||\n  item.json.Subject ||\n  '';\n\n// Remetente bruto\nconst fromRaw =\n  emailSelecionado.from ||\n  emailSelecionado.From ||\n  item.json.from ||\n  item.json.From ||\n  '';\n\n// Trata remetente quando vem como array de objeto\nlet remetenteNome = '';\nlet remetenteEmail = '';\n\nif (Array.isArray(fromRaw) && fromRaw.length > 0) {\n  remetenteNome = fromRaw[0].name || '';\n  remetenteEmail = fromRaw[0].address || '';\n} else if (typeof fromRaw === 'object' && fromRaw !== null) {\n  remetenteNome = fromRaw.name || '';\n  remetenteEmail = fromRaw.address || fromRaw.email || '';\n} else if (typeof fromRaw === 'string') {\n  const match = fromRaw.match(/<([^>]+)>/);\n  const emailMatch = fromRaw.match(/[^\\s<>\"]+@[^\\s<>\"]+\\.[^\\s<>\"]+/);\n\n  remetenteEmail = match ? match[1] : emailMatch ? emailMatch[0] : fromRaw;\n  remetenteNome = fromRaw.replace(/<[^>]+>/, '').trim();\n}\n\nconst remetenteFormatado = remetenteNome && remetenteEmail\n  ? `${remetenteNome} <${remetenteEmail}>`\n  : remetenteEmail;\n\n// Procura o primeiro PDF no binary\nfor (const [binaryKey, file] of Object.entries(binaries)) {\n  const fileName = file.fileName || '';\n  const mimeType = file.mimeType || '';\n\n  const isPdf =\n    mimeType === 'application/pdf' ||\n    fileName.toLowerCase().endsWith('.pdf');\n\n  if (isPdf) {\n    return [\n      {\n        json: {\n          email_id: item.json.id || emailSelecionado.email_id || emailSelecionado.id || '',\n          thread_id: item.json.threadId || emailSelecionado.threadId || '',\n          assunto: assunto,\n          remetente: remetenteFormatado,\n          remetente_email: remetenteEmail,\n          arquivo_nome: fileName || `curriculo_${Date.now()}.pdf`,\n          binary_original: binaryKey\n        },\n        binary: {\n          data: file\n        }\n      }\n    ];\n  }\n}\n\nreturn [];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -16,
+        -960
+      ],
+      "id": "201cb264-2574-4054-88cd-785aca37a0c0",
+      "name": "Filtrar 1 PDF"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1qIWS2yQ9JStiSlPBmtprN07pJMEpJRuIBQ0EkU0ldm0",
+          "mode": "list",
+          "cachedResultName": "CVFlow - CRM Curriculo",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1qIWS2yQ9JStiSlPBmtprN07pJMEpJRuIBQ0EkU0ldm0/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 2003250265,
+          "mode": "list",
+          "cachedResultName": "Candidatos",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1qIWS2yQ9JStiSlPBmtprN07pJMEpJRuIBQ0EkU0ldm0/edit#gid=2003250265"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "email",
+              "lookupValue": "={{ $json.cand_email }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        928,
+        -704
+      ],
+      "id": "327d6fcb-fc43-4c60-805b-d9f6eec0b34f",
+      "name": "Pesquisar se já existe",
+      "alwaysOutputData": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "SOnlTUthERIsn1fa",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Dados do candidato vindos do merge antes do IF\nlet dadosCandidato = {};\n\ntry {\n  dadosCandidato = $('Unir candidato + pesquisa').first().json || {};\n} catch (error) {\n  dadosCandidato = {};\n}\n\n// Dados do arquivo vindos do Upload file\nconst dadosArquivo = $json || {};\n\nreturn {\n  json: {\n    // Mantém todos os dados do candidato\n    ...dadosCandidato,\n\n    // Adiciona os dados do arquivo salvo no Drive\n    drive_file_id: dadosArquivo.id || '',\n    link_curriculo: dadosArquivo.webViewLink || '',\n    arquivo_drive_nome: dadosArquivo.name || ''\n  }\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1872,
+        -928
+      ],
+      "id": "2231b437-24f4-4de9-8bdb-401a68829eff",
+      "name": "Preparar dados finais para CRM"
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineByPosition",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        1312,
+        -1040
+      ],
+      "id": "b9dbe04e-4515-49d8-8ccc-84908b85df07",
+      "name": "Unir candidato + pesquisa"
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $('Unir candidato + pesquisa').first().json.cand_email }}",
+        "subject": "={{ \"Currículo já cadastrado em nossa base\" }}",
+        "message": "<div style=\"font-family: Arial, Helvetica, sans-serif; background-color: #f4f6f8; padding: 24px;\">   <div style=\"max-width: 620px; margin: 0 auto; background-color: #ffffff; border-radius: 10px; border: 1px solid #e5e7eb; overflow: hidden;\">      <div style=\"background-color: #374151; padding: 20px; text-align: center;\">       <h1 style=\"color: #ffffff; margin: 0; font-size: 22px;\">         Currículo já recebido anteriormente       </h1>     </div>      <div style=\"padding: 28px; color: #374151; font-size: 15px; line-height: 1.6;\">       <p>Olá!</p>        <p>         Verificamos que seu currículo já está cadastrado em nossa base.       </p>        <p>         Para evitar duplicidade, este novo envio não gerou um novo cadastro.       </p>        <div style=\"background-color: #f9fafb; border-left: 4px solid #f59e0b; padding: 14px 16px; margin: 22px 0;\">         <strong>Status:</strong> Currículo já existente na base.       </div>        <p>         Caso tenha enviado uma versão atualizada, nossa equipe poderá avaliar a necessidade de atualização dos dados.       </p>        <p style=\"margin-top: 28px;\">         Atenciosamente,<br>         <strong>Equipe de Recrutamento</strong>       </p>     </div>    </div> </div>",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        1712,
+        -1184
+      ],
+      "id": "3259acd4-97fa-4444-a2cb-0e0438be34d0",
+      "name": "Enviar aviso de currículo duplicado",
+      "webhookId": "12ea4d2e-7848-4b65-95c8-6a68215cbf13",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "xnkyXrokUbWcNpLM",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $('Unir candidato + pesquisa').first().json.cand_email }}",
+        "subject": "={{ \"Re: \" + $('Filtrar 1 PDF').item.json.assunto }}",
+        "message": "<div style=\"font-family: Arial, Helvetica, sans-serif; background-color: #f4f6f8; padding: 24px;\">\n  <div style=\"max-width: 620px; margin: 0 auto; background-color: #ffffff; border-radius: 10px; overflow: hidden; border: 1px solid #e5e7eb;\">\n    \n    <div style=\"background-color: #1f2937; padding: 20px; text-align: center;\">\n      <h1 style=\"color: #ffffff; margin: 0; font-size: 22px;\">\n        Currículo recebido com sucesso\n      </h1>\n    </div>\n\n    <div style=\"padding: 28px; color: #374151; font-size: 15px; line-height: 1.6;\">\n      <p>Olá!</p>\n\n      <p>\n        Confirmamos o recebimento do seu currículo.\n      </p>\n\n      <p>\n        O arquivo foi registrado em nossa base de recebimento e seguirá para análise.\n        Caso seu perfil esteja alinhado com alguma oportunidade, entraremos em contato\n        pelos canais informados no currículo.\n      </p>\n\n      <div style=\"background-color: #f9fafb; border-left: 4px solid #2563eb; padding: 14px 16px; margin: 22px 0;\">\n        <p style=\"margin: 0;\">\n          <strong>Status:</strong> Currículo recebido e enviado para análise.\n        </p>\n        <p style=\"margin: 6px 0 0 0;\">\n        \n        </p>\n      </div>\n\n      <p>\n        Agradecemos pelo envio e pelo interesse.\n      </p>\n\n      <p style=\"margin-top: 28px;\">\n        Atenciosamente,<br>\n        <strong>Equipe de Recrutamento</strong>\n      </p>\n    </div>\n\n    <div style=\"background-color: #f9fafb; padding: 14px; text-align: center; font-size: 12px; color: #6b7280;\">\n      Esta é uma mensagem automática. Não é necessário responder este e-mail.\n    </div>\n\n  </div>\n</div>",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        2240,
+        -928
+      ],
+      "id": "b016245c-4aa7-4d64-8888-70f00a3e0fe7",
+      "name": "Envio de confirmação",
+      "webhookId": "e73965e1-2b4d-439a-bcd9-24e3798c45c0",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "xnkyXrokUbWcNpLM",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "markAsRead",
+        "messageId": "={{ $('Unir candidato + pesquisa').first().json.email_id }}"
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        2480,
+        -1040
+      ],
+      "id": "778c17fa-b768-4c6d-b024-fd917dc5296f",
+      "name": "Marcar email como lido",
+      "webhookId": "ca8c4eb8-7fc4-402f-9251-572c187ad007",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "xnkyXrokUbWcNpLM",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "IDEIAS PARA ESCALONAR:\n\n\nRecebimento automático de currículos.\nConversão de Word para PDF.\nProcessamento de múltiplos anexos.\nAtualização automática de cadastros existentes.\nScore de compatibilidade com vagas.\nDashboard com métricas de recrutamento.\nBanco de talentos pesquisável por IA.\nBusca por competências (ex.: \"encontre candidatos com n8n e Power BI\").",
+        "height": 256,
+        "width": 400,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -752,
+        -768
+      ],
+      "typeVersion": 1,
+      "id": "d8c09e59-06c9-48bd-82fc-16c1114e6c7d",
+      "name": "Sticky Note"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Information Extractor",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Information Extractor": {
+      "main": [
+        [
+          {
+            "node": "Preparar dados do candidato",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Enviar aviso de currículo duplicado",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Upload file",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Alimentação em CRM": {
+      "main": [
+        [
+          {
+            "node": "Envio de confirmação",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Recolhe email com PDF": {
+      "main": [
+        [
+          {
+            "node": "Filtrar 1 PDF",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Get many messages",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get many messages": {
+      "main": [
+        [
+          {
+            "node": "Selecionar 1 e-mail",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Selecionar 1 e-mail": {
+      "main": [
+        [
+          {
+            "node": "Recolhe email com PDF",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extraindo informações": {
+      "main": [
+        [
+          {
+            "node": "Information Extractor",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filtrar 1 PDF": {
+      "main": [
+        [
+          {
+            "node": "Extraindo informações",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Upload file": {
+      "main": [
+        [
+          {
+            "node": "Preparar dados finais para CRM",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Preparar dados do candidato": {
+      "main": [
+        [
+          {
+            "node": "Pesquisar se já existe",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Unir candidato + pesquisa",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Pesquisar se já existe": {
+      "main": [
+        [
+          {
+            "node": "Unir candidato + pesquisa",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Preparar dados finais para CRM": {
+      "main": [
+        [
+          {
+            "node": "Alimentação em CRM",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Unir candidato + pesquisa": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Enviar aviso de currículo duplicado": {
+      "main": [
+        [
+          {
+            "node": "Marcar email como lido",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Envio de confirmação": {
+      "main": [
+        [
+          {
+            "node": "Marcar email como lido",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false,
+    "timeSavedMode": "fixed",
+    "callerPolicy": "workflowsFromSameOwner"
+  },
+  "versionId": "a53cd6e2-3182-45e2-ba35-547b58767b6e",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "7c9ac98895efde48080d4ab847f2889892c6841786c74cc0b1686a564fa77bbd"
+  },
+  "nodeGroups": [],
+  "id": "8elLhIB3Ju1oMHOu",
+  "tags": []
+}
